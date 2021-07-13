@@ -2,7 +2,7 @@
 #include <algorithm>
 using namespace std;
 
-int v, e, memo[10100], gum = 0, cnt[10100], memo2[100100];
+long long int v, e, memo[10100], gum = 0, cnt = 0, memo2[100100];
 
 struct graph{
 	int start, end, gil, inx;
@@ -17,22 +17,25 @@ bool cmpPoint(const graph &v, const graph &s){
 	}
 }
 
-int count(){
-	int s = 0;
-	for(int i = 1; i <= v; i++){
-		s += memo[i];
+int search(int start){
+	if(memo[start] == 0){
+		return start;
 	}
-	return s;
+	else{
+		return search(memo[start]);
+	}
 }
 
 int main(){
 	int a, b, c;
 	struct graph graph[2100];
-	scanf("%d %d", &v, &e);
+	printf("정점의 갯수 : ");
+	scanf("%d", &v);
+	printf("간선의 갯수 : ");
+	scanf("%d", &e);
+	printf("x y z의 형식으로 입력해주세요(x와 y가 이어진 길이가 z인 간선)\n"); 
 	for(int i = 0; i < e; i++){
 		scanf("%d %d %d", &a, &b, &c);
-		cnt[a]++;
-		cnt[b]++;
 		graph[2*i].inx = i;
 		graph[2*i+1].inx = i;
 		graph[2*i].start = a;
@@ -43,22 +46,27 @@ int main(){
 		graph[2*i+1].gil = c;
 	}
 	sort(graph, graph+e*2, cmpPoint);
-	printf("\n");
-	for(int i = 0; count() < v; i++){
+	//printf("\n");
+	for(int i = 0; cnt < v-1; i++){
 		if(memo2[graph[i].inx] == 1){
 			continue;
 		}
-		else if(memo[graph[i].start]+memo[graph[i].end] == 2){
+		else if(search(graph[i].end) == graph[i].start || search(graph[i].start) == graph[i].end){
 			continue;
 		}
 		else{
 			gum += graph[i].gil;
-			printf("%d %d %d\n", graph[i].start, graph[i].end, graph[i].gil);
-			memo[graph[i].start] = 1;
-			memo[graph[i].end] = 1;
+			cnt++;
+			printf("%c와 %c가 연결된 길이가 %d인 간선으로 연결합니다.\n", graph[i].start+64, graph[i].end+64, graph[i].gil);
+			if(memo[graph[i].start] != 0){
+				memo[graph[i].end] = graph[i].start;
+			}
+			else{
+				memo[graph[i].start] = graph[i].end;
+			}
 			memo2[graph[i].inx] = 1;
 		}
 	}
-	printf("%d", gum);
+	printf("간선의 총 길이 : %d", gum);
 }
 
